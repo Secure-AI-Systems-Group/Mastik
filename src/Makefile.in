@@ -1,0 +1,53 @@
+LIB=libmastik.a
+LIBSRCS=vlist.c l3.c timestats.c l1.c l1i.c fr.c util.c pda.c symbol.c ff.c @SYMBOL_SRCS@
+LIBOBJS=${LIBSRCS:.c=.o}
+VERSION=$(shell cut -f 1 -d \  ../VERSION)
+
+all: ${LIB} ${TARGETS}
+
+include LocalMakefile
+
+
+
+CFLAGS=-g -std=gnu99 -O2 -DNDEBUG ${EXTRA_CFLAGS} 
+
+
+
+
+
+${LIB}:${LIBOBJS}
+	ar crv ${LIB} ${LIBOBJS}
+	ranlib ${LIB}
+
+l3.o: l3.h vlist.h timestats.h low.h config.h
+
+vlist.o: vlist.h config.h
+
+timestats.o: timestats.h config.h
+
+
+#pp.o: vlist.h pp.h low.h
+
+l1.o: l1.h low.h  config.h
+
+l1i.o: l1i.h low.h config.h
+
+btb.o: btb.h low.h config.h
+
+ff.o: ff.h low.h vlist.h timestats.h config.h
+
+fr.o: fr.h low.h vlist.h config.h
+
+pda.o: pda.h low.h vlist.h config.h
+
+
+symbol.o: symbol.h util.h config.h
+
+LocalMakefile:
+	touch LocalMakefile
+
+clean:
+	rm -f ${LIB} ${LIBOBJS}
+
+distclean: clean
+	rm Makefile config.h
