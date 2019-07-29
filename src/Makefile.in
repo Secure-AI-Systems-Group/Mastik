@@ -9,7 +9,7 @@ include LocalMakefile
 
 
 
-CFLAGS=-g -std=gnu99 -O2 -DNDEBUG ${EXTRA_CFLAGS} 
+CFLAGS=-g -std=gnu99 -O2 -DNDEBUG -DNONBLOCK_TRACE ${EXTRA_CFLAGS} 
 
 
 

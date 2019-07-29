@@ -164,6 +164,47 @@ inline int is_active(uint16_t *results, int len, int threshold) {
   return 0;
 }
 
+#ifdef	NONBLOCK_TRACE
+/*
+ * Note: this version of 'fr_trace' does not wait until the function hits a thredhold
+ */
+int fr_trace(fr_t fr, int max_records, uint16_t *results, int slot, int threshold, int max_idle) {
+  assert(fr != NULL);
+  assert(results != NULL);
+
+  if (max_records == 0)
+    return 0;
+  if (max_idle == 0)
+    max_idle = max_records;
+
+  int len = vl_len(fr->vl);
+
+  // Initialize variables for looping
+  int count = 1;
+  int idle_count = 0;
+  int missed = 0;
+
+  // Record the initial time before the start
+  uint64_t prev_time = rdtscp64();
+
+  while (idle_count < max_idle && count < max_records) {
+    idle_count++;
+    results += len;
+    count++;
+    if (missed) {
+      for (int i = 0; i < len; i++)
+	results[i] = 0;
+    } else {
+      fr_probe(fr, results);
+      if (is_active(results, len, threshold))
+	idle_count = 0;
+    }
+    prev_time += slot;
+    missed = slotwait(prev_time);
+  }
+  return count;
+}
+#else
 int fr_trace(fr_t fr, int max_records, uint16_t *results, int slot, int threshold, int max_idle) {
   assert(fr != NULL);
   assert(results != NULL);
@@ -208,6 +249,7 @@ int fr_trace(fr_t fr, int max_records, uint16_t *results, int slot, int threshol
   }
   return count;
 }
+#endif
 
 int fr_repeatedprobe(fr_t fr, int max_records, uint16_t *results, int slot) {
   return fr_trace(fr, max_records, results, slot, 0, max_records);
