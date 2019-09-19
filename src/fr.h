@@ -61,6 +61,7 @@ void fr_probe(fr_t fr, uint16_t *results);
  * The return value is the number of records captured.
  */
 int fr_trace(fr_t fr, int max_records, uint16_t *results, int slot, int threshold, int max_idle);
+int fr_trtsc(fr_t fr, int max_records, uint64_t *starttsc, uint16_t *results, int slot, int threshold, int max_idle);
 
 int fr_repeatedprobe(fr_t fr, int max_records, uint16_t *results, int slot);
 
